@@ -1,0 +1,12 @@
+{
+  "version": 2,
+  "dgSpecHash": "pr+WoC+YsBA=",
+  "success": true,
+  "projectFilePath": "C:\\Users\\Edwar\\HuluxApi\\HuluxApi.csproj",
+  "expectedPackageFiles": [
+    "C:\\Users\\Edwar\\.nuget\\packages\\microsoft.aspnetcore.openapi\\10.0.15\\microsoft.aspnetcore.openapi.10.0.15.nupkg.sha512",
+    "C:\\Users\\Edwar\\.nuget\\packages\\microsoft.openapi\\2.13.0\\microsoft.openapi.2.13.0.nupkg.sha512",
+    "C:\\Users\\Edwar\\.nuget\\packages\\mysqlconnector\\3.0.0\\mysqlconnector.3.0.0.nupkg.sha512"
+  ],
+  "logs": []
+}
