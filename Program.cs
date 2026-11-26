@@ -599,4 +599,39 @@ app.MapGet("/transacciones/{clientId}", (int clientId) =>
     return movimientos;
 });
 
+app.MapGet("/crear-tablas", () =>
+{
+    using var connection = new NpgsqlConnection(connectionString);
+    connection.Open();
+
+    var sql = @"
+    CREATE TABLE IF NOT EXISTS clients(
+        idClients SERIAL PRIMARY KEY,
+        Nombre_Cliente VARCHAR(100),
+        Documento VARCHAR(50)
+    );
+
+    CREATE TABLE IF NOT EXISTS accounts(
+        idAccounts SERIAL PRIMARY KEY,
+        Contraseña VARCHAR(255),
+        Saldo NUMERIC(20,2) DEFAULT 0,
+        Clients_idClients INT REFERENCES clients(idClients)
+    );
+
+    CREATE TABLE IF NOT EXISTS transactions(
+        idTransaction SERIAL PRIMARY KEY,
+        Tipo VARCHAR(50),
+        Monto NUMERIC(20,2),
+        Fecha TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        Descripcion VARCHAR(255),
+        Accounts_idAccounts INT REFERENCES accounts(idAccounts)
+    );
+    ";
+
+    using var cmd = new NpgsqlCommand(sql, connection);
+    cmd.ExecuteNonQuery();
+
+    return "Tablas creadas";
+});
+
 app.Run();
