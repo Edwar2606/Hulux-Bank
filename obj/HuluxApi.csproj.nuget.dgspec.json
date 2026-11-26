@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\Edwar\\HuluxApi\\HuluxApi.csproj": {}
+    "C:\\Users\\Edwar\\Desktop\\HuluxApi\\HuluxApi.csproj": {}
   },
   "projects": {
-    "C:\\Users\\Edwar\\HuluxApi\\HuluxApi.csproj": {
+    "C:\\Users\\Edwar\\Desktop\\HuluxApi\\HuluxApi.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\Edwar\\HuluxApi\\HuluxApi.csproj",
+        "projectUniqueName": "C:\\Users\\Edwar\\Desktop\\HuluxApi\\HuluxApi.csproj",
         "projectName": "HuluxApi",
-        "projectPath": "C:\\Users\\Edwar\\HuluxApi\\HuluxApi.csproj",
+        "projectPath": "C:\\Users\\Edwar\\Desktop\\HuluxApi\\HuluxApi.csproj",
         "packagesPath": "C:\\Users\\Edwar\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\Edwar\\HuluxApi\\obj\\",
+        "outputPath": "C:\\Users\\Edwar\\Desktop\\HuluxApi\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "C:\\Users\\Edwar\\AppData\\Roaming\\NuGet\\NuGet.Config"
@@ -53,6 +53,10 @@
             "MySqlConnector": {
               "target": "Package",
               "version": "[3.0.0, )"
+            },
+            "Npgsql": {
+              "target": "Package",
+              "version": "[11.0.0, )"
             }
           },
           "imports": [

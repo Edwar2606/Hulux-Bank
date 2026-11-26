@@ -1,12 +1,16 @@
 {
   "version": 2,
-  "dgSpecHash": "pr+WoC+YsBA=",
+  "dgSpecHash": "pct21fVtYyk=",
   "success": true,
-  "projectFilePath": "C:\\Users\\Edwar\\HuluxApi\\HuluxApi.csproj",
+  "projectFilePath": "C:\\Users\\Edwar\\Desktop\\HuluxApi\\HuluxApi.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\Edwar\\.nuget\\packages\\microsoft.aspnetcore.openapi\\10.0.15\\microsoft.aspnetcore.openapi.10.0.15.nupkg.sha512",
+    "C:\\Users\\Edwar\\.nuget\\packages\\microsoft.extensions.dependencyinjection.abstractions\\11.0.0\\microsoft.extensions.dependencyinjection.abstractions.11.0.0.nupkg.sha512",
+    "C:\\Users\\Edwar\\.nuget\\packages\\microsoft.extensions.logging.abstractions\\11.0.0\\microsoft.extensions.logging.abstractions.11.0.0.nupkg.sha512",
     "C:\\Users\\Edwar\\.nuget\\packages\\microsoft.openapi\\2.13.0\\microsoft.openapi.2.13.0.nupkg.sha512",
-    "C:\\Users\\Edwar\\.nuget\\packages\\mysqlconnector\\3.0.0\\mysqlconnector.3.0.0.nupkg.sha512"
+    "C:\\Users\\Edwar\\.nuget\\packages\\mysqlconnector\\3.0.0\\mysqlconnector.3.0.0.nupkg.sha512",
+    "C:\\Users\\Edwar\\.nuget\\packages\\npgsql\\11.0.0\\npgsql.11.0.0.nupkg.sha512",
+    "C:\\Users\\Edwar\\.nuget\\packages\\system.diagnostics.diagnosticsource\\11.0.0\\system.diagnostics.diagnosticsource.11.0.0.nupkg.sha512"
   ],
   "logs": []
 }

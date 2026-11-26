@@ -1,7 +1,15 @@
+using HuluxApi;
 using HuluxApi.Models;
-using MySqlConnector;
+using Npgsql;
 
 var builder = WebApplication.CreateBuilder(args);
+
+builder.Services.AddHttpClient<FreebaseService>();
+
+var connectionString =
+    builder.Configuration.GetConnectionString("DefaultConnection")
+    ?? throw new InvalidOperationException(
+        "No se encontró la cadena de conexión a MySQL");
 
 builder.Services.AddOpenApi();
 
@@ -34,14 +42,12 @@ app.MapGet("/Hulux", () =>
 
 app.MapGet("/clientes", () =>
 {
-    string connectionString =
-        "Server=localhost;Database=hulux;User=root;Password=;";
 
-    using var connection = new MySqlConnection(connectionString);
+    using var connection = new NpgsqlConnection(connectionString);
 
     connection.Open();
 
-    using var command = new MySqlCommand(
+    using var command = new NpgsqlCommand(
         "SELECT idClients, Nombre_Cliente, Documento FROM clients",
         connection);
 
@@ -63,10 +69,8 @@ app.MapPost("/clients", (ClientRequest cliente) =>
     Console.WriteLine(cliente.Nombre_Cliente);
     Console.WriteLine(cliente.Documento);
 
-    string connectionString =
-        "Server=localhost;Database=hulux;User=root;Password=;";
 
-    using var connection = new MySqlConnection(connectionString);
+    using var connection = new NpgsqlConnection(connectionString);
 
     connection.Open();
 
@@ -74,12 +78,7 @@ app.MapPost("/clients", (ClientRequest cliente) =>
 
     try 
     {
-        using var commandClient = new MySqlCommand(
-            "INSERT INTO clients (Nombre_Cliente, Documento) VALUES (@Nombre_Cliente, @Documento)",
-            connection,
-            transaction);
-
-        using var verificar = new MySqlCommand(
+        using var verificar = new NpgsqlCommand(
             "SELECT COUNT(*) FROM clients WHERE Documento = @Documento",
             connection,
             transaction);
@@ -96,13 +95,28 @@ app.MapPost("/clients", (ClientRequest cliente) =>
     return "Ya existe un cliente con ese documento";
     }
 
-        commandClient.Parameters.AddWithValue("@Nombre_Cliente", cliente.Nombre_Cliente);
-        commandClient.Parameters.AddWithValue("@Documento", cliente.Documento);
-        commandClient.ExecuteNonQuery();
+       using var commandClient = new NpgsqlCommand(
+@"INSERT INTO clients
+(Nombre_Cliente, Documento)
+VALUES
+(@Nombre_Cliente, @Documento)
+RETURNING idClients",
+connection,
+transaction);
 
-        var clientId = commandClient.LastInsertedId;
+commandClient.Parameters.AddWithValue(
+    "@Nombre_Cliente",
+    cliente.Nombre_Cliente);
 
-        using var commandAccount = new MySqlCommand(
+commandClient.Parameters.AddWithValue(
+    "@Documento",
+    cliente.Documento);
+
+var clientId =
+    Convert.ToInt32(
+        commandClient.ExecuteScalar());
+
+        using var commandAccount = new NpgsqlCommand(
             "INSERT INTO accounts (Contraseña, Saldo, Clients_idClients) VALUES (@Contraseña, @Saldo, @Clients_idClients)",
             connection,
             transaction);
@@ -133,10 +147,8 @@ app.MapGet("/Cuentas", () =>
 
 app.MapPost("/deposito", (TransferRequest datos) =>
 {
-    string connectionString =
-        "Server=localhost;Database=hulux;User=root;Password=;";
 
-    using var connection = new MySqlConnection(connectionString);
+    using var connection = new NpgsqlConnection(connectionString);
 
     connection.Open();
 
@@ -149,7 +161,7 @@ app.MapPost("/deposito", (TransferRequest datos) =>
             return Results.BadRequest("Monto inválido");
         }
 
-        using var actualizarSaldo = new MySqlCommand(
+        using var actualizarSaldo = new NpgsqlCommand(
         @"UPDATE accounts
           SET Saldo = Saldo + @Monto
           WHERE Clients_idClients = @ClienteOrigen",
@@ -166,7 +178,7 @@ app.MapPost("/deposito", (TransferRequest datos) =>
 
         actualizarSaldo.ExecuteNonQuery();
 
-        using var movimiento = new MySqlCommand(
+        using var movimiento = new NpgsqlCommand(
         @"INSERT INTO transactions
         (Tipo, Monto, Descripcion, Accounts_idAccounts)
         VALUES
@@ -193,7 +205,7 @@ app.MapPost("/deposito", (TransferRequest datos) =>
 
         movimiento.ExecuteNonQuery();
 
-        using var saldoActual = new MySqlCommand(
+        using var saldoActual = new NpgsqlCommand(
         @"SELECT Saldo
           FROM accounts
           WHERE Clients_idClients = @ClienteOrigen",
@@ -224,10 +236,8 @@ app.MapPost("/deposito", (TransferRequest datos) =>
 });
 app.MapPost("/retiro", (TransferRequest datos) =>
 {
-    string connectionString =
-        "Server=localhost;Database=hulux;User=root;Password=;";
 
-    using var connection = new MySqlConnection(connectionString);
+    using var connection = new NpgsqlConnection(connectionString);
 
     connection.Open();
 
@@ -240,7 +250,7 @@ app.MapPost("/retiro", (TransferRequest datos) =>
             return Results.BadRequest("Monto inválido");
         }
 
-        using var consultarSaldo = new MySqlCommand(
+        using var consultarSaldo = new NpgsqlCommand(
         @"SELECT Saldo
           FROM accounts
           WHERE Clients_idClients = @ClienteOrigen",
@@ -260,7 +270,7 @@ app.MapPost("/retiro", (TransferRequest datos) =>
             return Results.BadRequest("Saldo insuficiente");
         }
 
-        using var descontar = new MySqlCommand(
+        using var descontar = new NpgsqlCommand(
         @"UPDATE accounts
           SET Saldo = Saldo - @Monto
           WHERE Clients_idClients = @ClienteOrigen",
@@ -277,7 +287,7 @@ app.MapPost("/retiro", (TransferRequest datos) =>
 
         descontar.ExecuteNonQuery();
 
-        using var movimiento = new MySqlCommand(
+        using var movimiento = new NpgsqlCommand(
         @"INSERT INTO transactions
         (Tipo, Monto, Descripcion, Accounts_idAccounts)
         VALUES
@@ -304,7 +314,7 @@ app.MapPost("/retiro", (TransferRequest datos) =>
 
         movimiento.ExecuteNonQuery();
 
-        using var saldoActual = new MySqlCommand(
+        using var saldoActual = new NpgsqlCommand(
         @"SELECT Saldo
           FROM accounts
           WHERE Clients_idClients = @ClienteOrigen",
@@ -336,10 +346,8 @@ app.MapPost("/retiro", (TransferRequest datos) =>
 
 app.MapPost("/transferencia", (TransferRequest datos) =>
 {
-    string connectionString =
-        "Server=localhost;Database=hulux;User=root;Password=;";
 
-    using var connection = new MySqlConnection(connectionString);
+    using var connection = new NpgsqlConnection(connectionString);
 
     connection.Open();
 
@@ -352,7 +360,7 @@ app.MapPost("/transferencia", (TransferRequest datos) =>
             return Results.BadRequest("Monto inválido");
         }
 
-        using var buscarDestino = new MySqlCommand(
+        using var buscarDestino = new NpgsqlCommand(
         @"SELECT idClients
           FROM clients
           WHERE Documento = @DocumentoDestino",
@@ -372,7 +380,7 @@ app.MapPost("/transferencia", (TransferRequest datos) =>
 
         int clienteDestino = Convert.ToInt32(destino);
 
-        using var consultarSaldo = new MySqlCommand(
+        using var consultarSaldo = new NpgsqlCommand(
         @"SELECT Saldo
           FROM accounts
           WHERE Clients_idClients = @ClienteOrigen",
@@ -391,7 +399,7 @@ app.MapPost("/transferencia", (TransferRequest datos) =>
             return Results.BadRequest("Saldo insuficiente");
         }
 
-        using var descontar = new MySqlCommand(
+        using var descontar = new NpgsqlCommand(
         @"UPDATE accounts
           SET Saldo = Saldo - @Monto
           WHERE Clients_idClients = @ClienteOrigen",
@@ -408,7 +416,7 @@ app.MapPost("/transferencia", (TransferRequest datos) =>
 
         descontar.ExecuteNonQuery();
 
-        using var sumar = new MySqlCommand(
+        using var sumar = new NpgsqlCommand(
         @"UPDATE accounts
           SET Saldo = Saldo + @Monto
           WHERE Clients_idClients = @ClienteDestino",
@@ -425,7 +433,7 @@ app.MapPost("/transferencia", (TransferRequest datos) =>
 
         sumar.ExecuteNonQuery();
 
-        using var movimientoSalida = new MySqlCommand(
+        using var movimientoSalida = new NpgsqlCommand(
         @"INSERT INTO transactions
         (Tipo, Monto, Descripcion, Accounts_idAccounts)
         VALUES
@@ -452,7 +460,7 @@ app.MapPost("/transferencia", (TransferRequest datos) =>
 
         movimientoSalida.ExecuteNonQuery();
 
-        using var movimientoEntrada = new MySqlCommand(
+        using var movimientoEntrada = new NpgsqlCommand(
         @"INSERT INTO transactions
         (Tipo, Monto, Descripcion, Accounts_idAccounts)
         VALUES
@@ -479,7 +487,7 @@ app.MapPost("/transferencia", (TransferRequest datos) =>
 
         movimientoEntrada.ExecuteNonQuery();
 
-        using var consultarNuevoSaldo = new MySqlCommand(
+        using var consultarNuevoSaldo = new NpgsqlCommand(
         @"SELECT Saldo
           FROM accounts
           WHERE Clients_idClients = @ClienteOrigen",
@@ -510,14 +518,12 @@ app.MapPost("/transferencia", (TransferRequest datos) =>
 
 app.MapPost("/login", (LoginRequest login) =>
 {
-    string connectionString =
-        "Server=localhost;Database=hulux;User=root;Password=;";
 
-    using var connection = new MySqlConnection(connectionString);
+    using var connection = new NpgsqlConnection(connectionString);
 
     connection.Open();
 
-    using var command = new MySqlCommand(
+    using var command = new NpgsqlCommand(
 @"SELECT
     c.idClients,
     c.Nombre_Cliente,
@@ -554,15 +560,13 @@ AND a.Contraseña = @Contraseña",
 
 app.MapGet("/transacciones/{clientId}", (int clientId) =>
 {
-    string connectionString =
-        "Server=localhost;Database=hulux;User=root;Password=;";
 
     using var connection =
-        new MySqlConnection(connectionString);
+        new NpgsqlConnection(connectionString);
 
     connection.Open();
 
-    using var command = new MySqlCommand(
+    using var command = new NpgsqlCommand(
     @"SELECT
         Tipo,
         Monto,
