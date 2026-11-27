@@ -575,7 +575,7 @@ app.MapGet("/transacciones/{clientId}", (int clientId) =>
       INNER JOIN accounts a
       ON t.Accounts_idAccounts = a.idAccounts
       WHERE a.Clients_idClients = @ClientId
-      ORDER BY t.idTransactions DESC",
+      ORDER BY t.idTransaction DESC",
     connection);
 
     command.Parameters.AddWithValue(
@@ -591,7 +591,7 @@ app.MapGet("/transacciones/{clientId}", (int clientId) =>
         movimientos.Add(new
         {
             Tipo = reader.GetString(0),
-            Monto = reader.GetDouble(1),
+            Monto = reader.GetDecimal(1),
             Descripcion = reader.GetString(2)
         });
     }

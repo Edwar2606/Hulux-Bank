@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("HuluxApi")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+2188969290918ed070fb0e20679e04c319fd4483")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+257aa850edb104802e2a246a641aafa1870e8d49")]
 [assembly: System.Reflection.AssemblyProductAttribute("HuluxApi")]
 [assembly: System.Reflection.AssemblyTitleAttribute("HuluxApi")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
